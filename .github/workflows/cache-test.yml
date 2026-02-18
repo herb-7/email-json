@@ -1,0 +1,39 @@
+name: Cache Test Workflow
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  cache-job:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      # Prime the cache with a specific key
+      - name: Cache dependencies
+        id: cache-step
+        uses: actions/cache@v4
+        with:
+          path: |
+            node_modules
+          key: cache-77c55f1
+          restore-keys: cache-77c55f1
+
+      # Echo cache hit/miss
+      - name: prime-cache-77c55f1
+        run: |
+          if [ "${{ steps.cache-step.outputs.cache-hit }}" == "true" ]; then
+            echo "Cache hit!"
+          else
+            echo "Cache miss!"
+          fi
+
+      # Install dependencies (will populate cache on miss)
+      - name: Install dependencies
+        if: steps.cache-step.outputs.cache-hit != 'true'
+        run: npm install
