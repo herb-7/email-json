@@ -14,7 +14,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      # Prime the cache with a specific key
+      # Cache dependencies
       - name: Cache dependencies
         id: cache-step
         uses: actions/cache@v4
@@ -26,6 +26,7 @@ jobs:
 
       # Echo cache hit/miss
       - name: prime-cache-77c55f1
+        id: prime-cache-77c55f1
         run: |
           if [ "${{ steps.cache-step.outputs.cache-hit }}" == "true" ]; then
             echo "Cache hit!"
@@ -33,7 +34,7 @@ jobs:
             echo "Cache miss!"
           fi
 
-      # Install dependencies (will populate cache on miss)
+      # Install dependencies if cache miss
       - name: Install dependencies
         if: steps.cache-step.outputs.cache-hit != 'true'
         run: npm install
